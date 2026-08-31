@@ -1,57 +1,143 @@
-<p align="center"><a href="https://laravel.com" target="_blank"><img src="https://raw.githubusercontent.com/laravel/art/master/logo-lockup/5%20SVG/2%20CMYK/1%20Full%20Color/laravel-logolockup-cmyk-red.svg" width="400" alt="Laravel Logo"></a></p>
+# Product Admin
 
-<p align="center">
-<a href="https://github.com/laravel/framework/actions"><img src="https://github.com/laravel/framework/workflows/tests/badge.svg" alt="Build Status"></a>
-<a href="https://packagist.org/packages/laravel/framework"><img src="https://img.shields.io/packagist/dt/laravel/framework" alt="Total Downloads"></a>
-<a href="https://packagist.org/packages/laravel/framework"><img src="https://img.shields.io/packagist/v/laravel/framework" alt="Latest Stable Version"></a>
-<a href="https://packagist.org/packages/laravel/framework"><img src="https://img.shields.io/packagist/l/laravel/framework" alt="License"></a>
-</p>
+A Laravel 13 + Vue.js 3 single-page application (SPA) admin panel that connects to an external Product API. This application does not use a local database; all data is proxied from the remote API server.
 
-## About Laravel
+## How It Works
 
-Laravel is a web application framework with expressive, elegant syntax. We believe development must be an enjoyable and creative experience to be truly fulfilling. Laravel takes the pain out of development by easing common tasks used in many web projects, such as:
+This admin panel acts as a **backend-for-frontend (BFF)** layer between the Vue.js frontend and the external Product API.
 
-- [Simple, fast routing engine](https://laravel.com/docs/routing).
-- [Powerful dependency injection container](https://laravel.com/docs/container).
-- Multiple back-ends for [session](https://laravel.com/docs/session) and [cache](https://laravel.com/docs/cache) storage.
-- Expressive, intuitive [database ORM](https://laravel.com/docs/eloquent).
-- Database agnostic [schema migrations](https://laravel.com/docs/migrations).
-- [Robust background job processing](https://laravel.com/docs/queues).
-- [Real-time event broadcasting](https://laravel.com/docs/broadcasting).
+### Authentication Flow
 
-Laravel is accessible, powerful, and provides tools required for large, robust applications.
+1. User submits credentials (email/password) to `/api/login`
+2. Laravel proxies the credentials to `{{API_SERVER}}/token`
+3. On success, the API returns a bearer token
+4. Laravel stores the token in the session and fetches user details from `{{API_SERVER}}/me`
+5. The user's role and account information are stored in the session
+6. Subsequent API requests use the stored bearer token to proxy data from the external API
 
-## Learning Laravel
+### Session Management
 
-Laravel has the most extensive and thorough [documentation](https://laravel.com/docs) and video tutorial library of all modern web application frameworks, making it a breeze to get started with the framework.
+- Authentication state is maintained via Laravel session cookies
+- The API bearer token is stored server-side in the session
+- No local user database is used; user data comes from the remote API
 
-In addition, [Laracasts](https://laracasts.com) contains thousands of video tutorials on a range of topics including Laravel, modern PHP, unit testing, and JavaScript. Boost your skills by digging into our comprehensive video library.
+## Features
 
-You can also watch bite-sized lessons with real-world projects on [Laravel Learn](https://laravel.com/learn), where you will be guided through building a Laravel application from scratch while learning PHP fundamentals.
+- **Authentication**: Login/logout against external API with bearer token storage
+- **Role-Based Access Control**: Features gated by user role (e.g., `Account Admin` can manage users)
+- **Products**: Browse products with filters and pagination
+  - Filter by name, SKU, barcode, status, stock, and price
+  - Paginated results from the API
+- **Users**: View, create, edit, and delete users (requires `Account Admin` role)
+  - Assign roles during user creation/editing
+  - Available roles: `Account Admin`, `Account User`, `Account Api User`
+- **Profile**: View current user details including role and account information
+- **Responsive UI**: Mobile-friendly navigation with Tailwind CSS
 
-## Agentic Development
+## Requirements
 
-Laravel's predictable structure and conventions make it ideal for AI coding agents like Claude Code, Cursor, and GitHub Copilot. Install [Laravel Boost](https://laravel.com/docs/ai) to supercharge your AI workflow:
+- PHP 8.3+
+- Composer
+- Node.js & npm
+- External Product API server
+
+## Installation
+
+1. **Clone the repository**
+   ```bash
+   git clone <repository-url> product-admin
+   cd product-admin
+   ```
+
+2. **Install PHP dependencies**
+   ```bash
+   composer install
+   ```
+
+3. **Install Node dependencies**
+   ```bash
+   npm install
+   ```
+
+4. **Configure environment**
+   ```bash
+   cp .env.example .env
+   ```
+   
+   Update the following variables in `.env`:
+   ```env
+   APP_URL=http://localhost:8000
+   API_SERVER=http://your-api-server.com
+   API_VERSION=v1
+   ```
+
+5. **Generate application key**
+   ```bash
+   php artisan key:generate
+   ```
+
+6. **Build frontend assets**
+   ```bash
+   npm run build
+   ```
+
+7. **Start the development server**
+   ```bash
+   php artisan serve
+   ```
+
+8. **Access the application**
+   
+   Navigate to `http://localhost:8000` in your browser.
+
+## Development
+
+Run the development server with Vite hot reloading:
 
 ```bash
-composer require laravel/boost --dev
-
-php artisan boost:install
+composer run dev
 ```
 
-Boost provides your agent 15+ tools and skills that help agents build Laravel applications while following best practices.
+This starts the Laravel development server, queues worker, logs, and Vite dev server simultaneously.
 
-## Contributing
+## Testing
 
-Thank you for considering contributing to the Laravel framework! The contribution guide can be found in the [Laravel documentation](https://laravel.com/docs/contributions).
+Run the test suite with Pest:
 
-## Code of Conduct
+```bash
+vendor/bin/pest
+```
 
-In order to ensure that the Laravel community is welcoming to all, please review and abide by the [Code of Conduct](https://laravel.com/docs/contributions#code-of-conduct).
+Run specific test files:
 
-## Security Vulnerabilities
+```bash
+vendor/bin/pest tests/Feature/AuthTest.php
+vendor/bin/pest tests/Unit/ApiServiceTest.php
+```
 
-If you discover a security vulnerability within Laravel, please send an e-mail to Taylor Otwell via [taylor@laravel.com](mailto:taylor@laravel.com). All security vulnerabilities will be promptly addressed.
+## API Configuration
+
+The application expects the following endpoints from the Product API:
+
+| Endpoint | Purpose |
+|----------|---------|
+| `{{API_SERVER}}/token` | Exchange email/password for bearer token |
+| `{{API_SERVER}}/me` | Get current authenticated user details |
+| `{{API_SERVER}}/{{version}}/products` | List products with pagination and filters |
+| `{{API_SERVER}}/{{version}}/users` | List users with pagination |
+| `{{API_SERVER}}/{{version}}/users/{id}` | Get single user |
+| `{{API_SERVER}}/{{version}}/users` (POST) | Create user |
+| `{{API_SERVER}}/{{version}}/users/{id}` (PUT) | Update user |
+| `{{API_SERVER}}/{{version}}/users/{id}` (DELETE) | Delete user |
+
+## Environment Variables
+
+| Variable | Description | Default |
+|----------|-------------|---------|
+| `API_SERVER` | Base URL of the Product API | Required |
+| `API_VERSION` | API version prefix | `v1` |
+| `API_TOKEN_URL` | Token endpoint path | `{{API_SERVER}}/token` |
+| `API_ME_URL` | Me endpoint path | `{{API_SERVER}}/me` |
 
 ## License
 

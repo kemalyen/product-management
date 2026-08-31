@@ -4,14 +4,14 @@
             <div class="px-4 py-5 sm:p-6">
                 <div class="flex justify-between items-center mb-4">
                     <h3 class="text-lg leading-6 font-medium text-gray-900">
-                        Users
+                        Accounts
                     </h3>
                     <button
                         v-if="auth.hasRole('Admin')"
                         @click="openModal()"
                         class="inline-flex items-center px-4 py-2 border border-transparent text-sm font-medium rounded-md text-white bg-indigo-600 hover:bg-indigo-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500"
                     >
-                        Create User
+                        Create Account
                     </button>
                 </div>
 
@@ -21,8 +21,8 @@
                 <div v-else-if="error" class="text-red-600 py-4">
                     {{ error }}
                 </div>
-                <div v-else-if="users.length === 0" class="text-gray-500 py-4">
-                    No users found.
+                <div v-else-if="accounts.length === 0" class="text-gray-500 py-4">
+                    No accounts found.
                 </div>
 
                 <table v-else class="min-w-full divide-y divide-gray-200">
@@ -35,10 +35,10 @@
                                 Name
                             </th>
                             <th scope="col" class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
-                                Email
+                                Account Number
                             </th>
                             <th scope="col" class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
-                                Role
+                                Status
                             </th>
                             <th v-if="auth.hasRole('Admin')" scope="col" class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
                                 Actions
@@ -46,22 +46,25 @@
                         </tr>
                     </thead>
                     <tbody class="bg-white divide-y divide-gray-200">
-                        <tr v-for="user in users" :key="user.id">
+                        <tr v-for="account in accounts" :key="account.id">
                             <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-900">
-                                {{ user.id }}
+                                {{ account.id }}
                             </td>
                             <td class="px-6 py-4 text-sm text-gray-900">
-                                {{ user.attributes?.name || user.name || '—' }}
+                                {{ account.attributes?.name || '—' }}
                             </td>
                             <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500">
-                                {{ user.attributes?.email || user.email || '—' }}
+                                {{ account.attributes?.account_number || '—' }}
                             </td>
-                            <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500">
-                                {{ user?.relationships?.roles?.data?.name || '—' }}
+                            <td class="px-6 py-4 whitespace-nowrap">
+                                <span class="px-2 inline-flex text-xs leading-5 font-semibold rounded-full"
+                                    :class="statusClass(account.attributes?.status)">
+                                    {{ account.attributes?.status?.toUpperCase() || '—' }}
+                                </span>
                             </td>
                             <td v-if="auth.hasRole('Admin')" class="px-6 py-4 whitespace-nowrap text-sm font-medium">
-                                <button @click="openModal(user)" class="text-indigo-600 hover:text-indigo-900 mr-3">Edit</button>
-                                <button @click="confirmDelete(user)" class="text-red-600 hover:text-red-900">Delete</button>
+                                <button @click="openModal(account)" class="text-indigo-600 hover:text-indigo-900 mr-3">Edit</button>
+                                <button @click="confirmDelete(account)" class="text-red-600 hover:text-red-900">Delete</button>
                             </td>
                         </tr>
                     </tbody>
@@ -104,7 +107,7 @@
             <div class="bg-white rounded-lg shadow-xl max-w-md w-full mx-4">
                 <div class="px-4 py-5 sm:p-6">
                     <h3 class="text-lg leading-6 font-medium text-gray-900 mb-4">
-                        {{ isEditing ? 'Edit User' : 'Create User' }}
+                        {{ isEditing ? 'Edit Account' : 'Create Account' }}
                     </h3>
                     <form @submit.prevent="handleSubmit">
                         <div class="space-y-4">
@@ -119,38 +122,28 @@
                                 />
                             </div>
                             <div>
-                                <label for="email" class="block text-sm font-medium text-gray-700">Email</label>
+                                <label for="account_number" class="block text-sm font-medium text-gray-700">Account Number</label>
                                 <input
-                                    id="email"
-                                    v-model="form.email"
-                                    type="email"
+                                    id="account_number"
+                                    v-model="form.account_number"
+                                    type="text"
                                     required
                                     class="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-indigo-500 focus:ring-indigo-500 sm:text-sm"
                                 />
                             </div>
                             <div>
-                                <label for="role" class="block text-sm font-medium text-gray-700">Role</label>
+                                <label for="status" class="block text-sm font-medium text-gray-700">Status</label>
                                 <select
-                                    id="role"
-                                    v-model="form.role"
+                                    id="status"
+                                    v-model="form.status"
                                     required
                                     class="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-indigo-500 focus:ring-indigo-500 sm:text-sm"
                                 >
-                                    <option value="">Select a role</option>
-                                    <option value="Admin">Admin</option>
-                                    <option value="Account User">Account User</option>
-                                    <option value="Account Api User">Account Api User</option>
+                                    <option value="">Select</option>
+                                    <option value="active">Active</option>
+                                    <option value="pending">Pending</option>
+                                    <option value="disabled">Disabled</option>
                                 </select>
-                            </div>
-                            <div v-if="!isEditing">
-                                <label for="password" class="block text-sm font-medium text-gray-700">Password</label>
-                                <input
-                                    id="password"
-                                    v-model="form.password"
-                                    type="password"
-                                    required
-                                    class="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-indigo-500 focus:ring-indigo-500 sm:text-sm"
-                                />
                             </div>
                         </div>
                         <div class="mt-5 sm:mt-6 sm:grid sm:grid-cols-2 sm:gap-3 sm:grid-flow-row-dense">
@@ -178,10 +171,10 @@
             <div class="bg-white rounded-lg shadow-xl max-w-md w-full mx-4">
                 <div class="px-4 py-5 sm:p-6">
                     <h3 class="text-lg leading-6 font-medium text-gray-900 mb-2">
-                        Delete User
+                        Delete Account
                     </h3>
                     <p class="text-sm text-gray-500 mb-4">
-                        Are you sure you want to delete {{ selectedUser?.attributes?.name || selectedUser?.name }}? This action cannot be undone.
+                        Are you sure you want to delete {{ selectedAccount?.attributes?.name || selectedAccount?.name }}? This action cannot be undone.
                     </p>
                     <div class="mt-5 sm:mt-6 sm:grid sm:grid-cols-2 sm:gap-3 sm:grid-flow-row-dense">
                         <button
@@ -207,38 +200,37 @@
 
 <script setup>
 import { ref, reactive, onMounted, computed } from 'vue'
-import { useUsers } from '../composables/useUsers'
+import { useAccounts } from '../composables/useAccounts'
 import { useAuth } from '../composables/useAuth'
 
 const auth = useAuth()
 const {
-    users,
+    accounts,
     pagination,
     loading,
     error,
-    fetchUsers,
+    fetchAccounts,
     goToPage,
-    createUser,
-    updateUser,
-    deleteUser,
-} = useUsers()
+    createAccount,
+    updateAccount,
+    deleteAccount,
+} = useAccounts()
 
 const showModal = ref(false)
 const showDeleteModal = ref(false)
 const isEditing = ref(false)
 const formLoading = ref(false)
 const deleteLoading = ref(false)
-const selectedUser = ref(null)
+const selectedAccount = ref(null)
 
 const form = reactive({
     name: '',
-    email: '',
-    password: '',
-    role: '',
+    account_number: '',
+    status: '',
 })
 
 onMounted(() => {
-    fetchUsers(1)
+    fetchAccounts(1)
 })
 
 const pageLinks = computed(() => {
@@ -255,21 +247,19 @@ const pageLinks = computed(() => {
         }))
 })
 
-const openModal = (user = null) => {
-    if (user) {
+const openModal = (account = null) => {
+    if (account) {
         isEditing.value = true
-        form.name = user.attributes?.name || user.name || ''
-        form.email = user.attributes?.email || user.email || ''
-        form.password = ''
-        form.role = user?.relationships?.roles?.data?.name || ''
-        selectedUser.value = user
+        form.name = account.attributes?.name || ''
+        form.account_number = account.attributes?.account_number || ''
+        form.status = account.attributes?.status || ''
+        selectedAccount.value = account
     } else {
         isEditing.value = false
         form.name = ''
-        form.email = ''
-        form.password = ''
-        form.role = ''
-        selectedUser.value = null
+        form.account_number = ''
+        form.status = ''
+        selectedAccount.value = null
     }
     showModal.value = true
 }
@@ -277,11 +267,10 @@ const openModal = (user = null) => {
 const closeModal = () => {
     showModal.value = false
     isEditing.value = false
-    selectedUser.value = null
+    selectedAccount.value = null
     form.name = ''
-    form.email = ''
-    form.password = ''
-    form.role = ''
+    form.account_number = ''
+    form.status = ''
 }
 
 const handleSubmit = async () => {
@@ -290,52 +279,57 @@ const handleSubmit = async () => {
     try {
         const payload = {
             name: form.name,
-            email: form.email,
-            role: form.role,
+            account_number: form.account_number,
+            status: form.status,
         }
 
-        if (!isEditing.value && form.password) {
-            payload.password = form.password
-        }
-
-        if (isEditing.value && form.password) {
-            payload.password = form.password
-        }
-
-        if (isEditing.value && selectedUser.value) {
-            await updateUser(selectedUser.value.id, payload)
+        if (isEditing.value && selectedAccount.value) {
+            await updateAccount(selectedAccount.value.id, payload)
         } else {
-            await createUser(payload)
+            await createAccount(payload)
         }
 
         closeModal()
-        fetchUsers(pagination.current_page)
+        fetchAccounts(pagination.current_page)
     } catch (e) {
-        error.value = e.message || 'Failed to save user'
+        error.value = e.message || 'Failed to save account'
     } finally {
         formLoading.value = false
     }
 }
 
-const confirmDelete = (user) => {
-    selectedUser.value = user
+const confirmDelete = (account) => {
+    selectedAccount.value = account
     showDeleteModal.value = true
 }
 
 const handleDelete = async () => {
-    if (!selectedUser.value) return
+    if (!selectedAccount.value) return
 
     deleteLoading.value = true
 
     try {
-        await deleteUser(selectedUser.value.id)
+        await deleteAccount(selectedAccount.value.id)
         showDeleteModal.value = false
-        selectedUser.value = null
-        fetchUsers(pagination.current_page)
+        selectedAccount.value = null
+        fetchAccounts(pagination.current_page)
     } catch (e) {
-        error.value = e.message || 'Failed to delete user'
+        error.value = e.message || 'Failed to delete account'
     } finally {
         deleteLoading.value = false
+    }
+}
+
+const statusClass = (status) => {
+    switch (status) {
+        case 'active':
+            return 'bg-green-100 text-green-800'
+        case 'pending':
+            return 'bg-yellow-100 text-yellow-800'
+        case 'disabled':
+            return 'bg-red-100 text-red-800'
+        default:
+            return 'bg-gray-100 text-gray-800'
     }
 }
 </script>

@@ -4,6 +4,7 @@ import Products from '../pages/Products.vue'
 import Users from '../pages/Users.vue'
 import Login from '../pages/Login.vue'
 import Profile from '../pages/Profile.vue'
+import Accounts from '../pages/Accounts.vue'
 import { useAuth } from '../composables/useAuth'
 
 const routes = [
@@ -38,6 +39,12 @@ const routes = [
         meta: { requiresAuth: true },
     },
     {
+        path: '/accounts',
+        name: 'accounts',
+        component: Accounts,
+        meta: { requiresAuth: true, requiresAdmin: true },
+    },
+    {
         path: '/:pathMatch(.*)*',
         redirect: '/',
     },
@@ -60,6 +67,10 @@ router.beforeEach(async (to) => {
 
     if (to.meta.requiresAuth && !auth.isAuthenticated.value) {
         return { name: 'login', query: { redirect: to.fullPath } }
+    }
+
+    if (to.meta.requiresAdmin && !auth.hasRole('Admin')) {
+        return { name: 'home' }
     }
 
     if (to.meta.requiresGuest && auth.isAuthenticated.value) {

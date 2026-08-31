@@ -6,7 +6,7 @@ use App\Services\ApiService;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;
 
-class ProductController extends Controller
+class AccountController extends Controller
 {
     public function __construct(private ApiService $api) {}
 
@@ -20,7 +20,7 @@ class ProductController extends Controller
             $params['page'] = (int) $params['page'];
         }
 
-        $data = $this->api->get(config('services.api.version').'/'.'products', $params, $token);
+        $data = $this->api->get(config('services.api.version') . '/' . 'accounts', $params, $token);
 
         return response()->json($data);
     }
@@ -29,7 +29,7 @@ class ProductController extends Controller
     {
         $token = $request->session()->get('api_token');
 
-        $data = $this->api->get(config('services.api.version').'/'.'products/'.$id, [], $token);
+        $data = $this->api->get(config('services.api.version') . '/' . 'accounts/' . $id, [], $token);
 
         return response()->json($data);
     }
@@ -40,15 +40,11 @@ class ProductController extends Controller
 
         $payload = $request->validate([
             'name' => ['required', 'string', 'max:255'],
-            'description' => ['nullable', 'string'],
-            'sku' => ['required', 'string', 'max:255'],
-            'barcode' => ['required', 'string', 'max:255'],
+            'account_number' => ['required', 'digits_between:2,10', 'unique:accounts'],
             'status' => ['required', 'string'],
-            'stock' => ['required', 'integer'],
-            'price' => ['required', 'numeric'],
         ]);
 
-        $data = $this->api->post(config('services.api.version').'/'.'products', $payload, $token);
+        $data = $this->api->post(config('services.api.version') . '/' . 'accounts', $payload, $token);
 
         return response()->json($data, 201);
     }
@@ -59,15 +55,11 @@ class ProductController extends Controller
 
         $payload = $request->validate([
             'name' => ['sometimes', 'string', 'max:255'],
-            'description' => ['nullable', 'string'],
-            'sku' => ['sometimes', 'string', 'max:255'],
-            'barcode' => ['sometimes', 'string', 'max:255'],
+            'account_number' => ['sometimes', 'string', 'max:255'],
             'status' => ['sometimes', 'string'],
-            'stock' => ['sometimes', 'integer'],
-            'price' => ['sometimes', 'numeric'],
         ]);
 
-        $data = $this->api->put(config('services.api.version').'/'.'products/'.$id, $payload, $token);
+        $data = $this->api->put(config('services.api.version') . '/' . 'accounts/' . $id, $payload, $token);
 
         return response()->json($data);
     }
@@ -76,7 +68,7 @@ class ProductController extends Controller
     {
         $token = $request->session()->get('api_token');
 
-        $this->api->delete(config('services.api.version').'/'.'products/'.$id, $token);
+        $this->api->delete(config('services.api.version') . '/' . 'accounts/' . $id, $token);
 
         return response()->json(null, 204);
     }

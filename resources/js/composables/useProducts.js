@@ -102,6 +102,69 @@ export function useProducts() {
         }
     }
 
+    const showProduct = async (id) => {
+        const response = await fetch(`/api/products/${id}`, {
+            headers: {
+                'Accept': 'application/json',
+            },
+        })
+
+        if (!response.ok) {
+            throw new Error('Failed to fetch product')
+        }
+
+        return response.json()
+    }
+
+    const createProduct = async (payload) => {
+        const response = await fetch('/api/products', {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json',
+                'Accept': 'application/json',
+            },
+            body: JSON.stringify(payload),
+        })
+
+        if (!response.ok) {
+            const error = await response.json()
+            throw new Error(error.message || 'Failed to create product')
+        }
+
+        return response.json()
+    }
+
+    const updateProduct = async (id, payload) => {
+        const response = await fetch(`/api/products/${id}`, {
+            method: 'PUT',
+            headers: {
+                'Content-Type': 'application/json',
+                'Accept': 'application/json',
+            },
+            body: JSON.stringify(payload),
+        })
+
+        if (!response.ok) {
+            const error = await response.json()
+            throw new Error(error.message || 'Failed to update product')
+        }
+
+        return response.json()
+    }
+
+    const deleteProduct = async (id) => {
+        const response = await fetch(`/api/products/${id}`, {
+            method: 'DELETE',
+            headers: {
+                'Accept': 'application/json',
+            },
+        })
+
+        if (!response.ok) {
+            throw new Error('Failed to delete product')
+        }
+    }
+
     return {
         products,
         pagination,
@@ -112,5 +175,9 @@ export function useProducts() {
         applyFilters,
         resetFilters,
         goToPage,
+        showProduct,
+        createProduct,
+        updateProduct,
+        deleteProduct,
     }
 }

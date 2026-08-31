@@ -1,6 +1,6 @@
 <template>
     <div class="min-h-screen bg-gray-50">
-        <nav class="bg-white shadow-sm border-b border-gray-200">
+        <nav v-if="auth.isAuthenticated" class="bg-white shadow-sm border-b border-gray-200">
             <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
                 <div class="flex justify-between h-16">
                     <div class="flex">
@@ -8,26 +8,23 @@
                             Product Admin
                         </RouterLink>
                         <div class="hidden sm:flex sm:space-x-8">
-                            <RouterLink to="/" class="inline-flex items-center px-1 pt-1 text-sm font-medium text-gray-900 border-b-2" active-class="border-indigo-500 text-indigo-600" inactive-class="border-transparent text-gray-500 hover:border-gray-300 hover:text-gray-700">
+                            <RouterLink to="/" class="inline-flex items-center px-1 pt-1 text-sm font-medium border-b-2" active-class="border-indigo-500 text-indigo-600" inactive-class="border-transparent text-gray-500 hover:border-gray-300 hover:text-gray-700">
                                 Home
                             </RouterLink>
-                            <RouterLink to="/products" class="inline-flex items-center px-1 pt-1 text-sm font-medium text-gray-900 border-b-2" active-class="border-indigo-500 text-indigo-600" inactive-class="border-transparent text-gray-500 hover:border-gray-300 hover:text-gray-700">
+                            <RouterLink to="/products" class="inline-flex items-center px-1 pt-1 text-sm font-medium border-b-2" active-class="border-indigo-500 text-indigo-600" inactive-class="border-transparent text-gray-500 hover:border-gray-300 hover:text-gray-700">
                                 Products
                             </RouterLink>
-                            <RouterLink to="/users" class="inline-flex items-center px-1 pt-1 text-sm font-medium text-gray-900 border-b-2" active-class="border-indigo-500 text-indigo-600" inactive-class="border-transparent text-gray-500 hover:border-gray-300 hover:text-gray-700">
+                            <RouterLink to="/users" class="inline-flex items-center px-1 pt-1 text-sm font-medium border-b-2" active-class="border-indigo-500 text-indigo-600" inactive-class="border-transparent text-gray-500 hover:border-gray-300 hover:text-gray-700">
                                 Users
+                            </RouterLink>
+                            <RouterLink to="/profile" class="inline-flex items-center px-1 pt-1 text-sm font-medium border-b-2" active-class="border-indigo-500 text-indigo-600" inactive-class="border-transparent text-gray-500 hover:border-gray-300 hover:text-gray-700">
+                                Profile
                             </RouterLink>
                         </div>
                     </div>
-                    <div class="flex items-center sm:hidden">
-                        <button @click="mobileMenuOpen = !mobileMenuOpen" type="button" class="inline-flex items-center justify-center p-2 rounded-md text-gray-400 hover:text-gray-500 hover:bg-gray-100 focus:outline-none focus:ring-2 focus:ring-inset focus:ring-indigo-500" aria-controls="mobile-menu" aria-expanded="false">
-                            <span class="sr-only">Open main menu</span>
-                            <svg v-if="!mobileMenuOpen" class="block h-6 w-6" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor" aria-hidden="true">
-                                <path stroke-linecap="round" stroke-linejoin="round" d="M3.75 6.75h16.5M3.75 12h16.5m-16.5 5.25h16.5" />
-                            </svg>
-                            <svg v-else class="block h-6 w-6" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor" aria-hidden="true">
-                                <path stroke-linecap="round" stroke-linejoin="round" d="M6 18L18 6M6 6l12 12" />
-                            </svg>
+                    <div class="flex items-center">
+                        <button @click="handleLogout" type="button" class="inline-flex items-center px-3 py-2 border border-transparent text-sm leading-4 font-medium rounded-md text-indigo-700 bg-indigo-100 hover:bg-indigo-200 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500">
+                            Sign out
                         </button>
                     </div>
                 </div>
@@ -44,6 +41,9 @@
                     <RouterLink to="/users" class="block pl-3 pr-4 py-2 text-base font-medium border-l-4" active-class="bg-indigo-50 border-indigo-500 text-indigo-700" inactive-class="border-transparent text-gray-500 hover:bg-gray-50 hover:border-gray-300 hover:text-gray-700">
                         Users
                     </RouterLink>
+                    <RouterLink to="/profile" class="block pl-3 pr-4 py-2 text-base font-medium border-l-4" active-class="bg-indigo-50 border-indigo-500 text-indigo-700" inactive-class="border-transparent text-gray-500 hover:bg-gray-50 hover:border-gray-300 hover:text-gray-700">
+                        Profile
+                    </RouterLink>
                 </div>
             </div>
         </nav>
@@ -55,7 +55,20 @@
 </template>
 
 <script setup>
-import { ref } from 'vue'
+import { ref, onMounted } from 'vue'
+import { useRouter } from 'vue-router'
+import { useAuth } from '../composables/useAuth'
 
+const router = useRouter()
+const auth = useAuth()
 const mobileMenuOpen = ref(false)
+
+onMounted(async () => {
+    await auth.fetchUser()
+})
+
+const handleLogout = async () => {
+    await auth.logout()
+    router.push('/login')
+}
 </script>

@@ -35,4 +35,11 @@ return [
         ],
     ],
 
+    'api' => [
+        'server' => env('API_SERVER'),
+        'token_url' => env('API_TOKEN_URL', env('API_SERVER').'/token'),
+        'me_url' => env('API_ME_URL', env('API_SERVER').'/me'),
+        'version' => env('API_VERSION', 'v1'),
+    ],
+
 ];

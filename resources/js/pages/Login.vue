@@ -59,6 +59,9 @@
 import { ref } from 'vue'
 import { useRouter } from 'vue-router'
 import { useAuth } from '../composables/useAuth'
+import { usePageTitle } from '../composables/usePageTitle'
+
+usePageTitle('Login')
 
 const router = useRouter()
 const auth = useAuth()

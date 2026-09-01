@@ -203,7 +203,10 @@ import { ref, reactive, onMounted, computed } from 'vue'
 import { useAccounts } from '../composables/useAccounts'
 import { useAuth } from '../composables/useAuth'
 import { useToast } from '../composables/useToast'
+import { usePageTitle } from '../composables/usePageTitle'
 import SortIcon from '../components/SortIcon.vue'
+
+usePageTitle('Accounts')
 
 const auth = useAuth()
 const toast = useToast()

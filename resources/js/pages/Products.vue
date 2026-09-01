@@ -384,7 +384,10 @@ import { ref, reactive, onMounted, computed } from 'vue'
 import { useProducts } from '../composables/useProducts'
 import { useAuth } from '../composables/useAuth'
 import { useToast } from '../composables/useToast'
+import { usePageTitle } from '../composables/usePageTitle'
 import SortIcon from '../components/SortIcon.vue'
+
+usePageTitle('Products')
 
 const auth = useAuth()
 const toast = useToast()

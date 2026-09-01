@@ -118,6 +118,9 @@
 import { computed, reactive, ref } from 'vue'
 import { useAuth } from '../composables/useAuth'
 import { useToast } from '../composables/useToast'
+import { usePageTitle } from '../composables/usePageTitle'
+
+usePageTitle('Profile')
 
 const auth = useAuth()
 const toast = useToast()

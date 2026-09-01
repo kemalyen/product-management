@@ -67,6 +67,9 @@
 <script setup>
 import { ref, onMounted } from 'vue'
 import { useAuth } from '../composables/useAuth'
+import { usePageTitle } from '../composables/usePageTitle'
+
+usePageTitle('Dashboard')
 
 const auth = useAuth()
 const productCount = ref(0)

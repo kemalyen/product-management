@@ -224,7 +224,10 @@ import { useUsers } from '../composables/useUsers'
 import { useAccounts } from '../composables/useAccounts'
 import { useAuth } from '../composables/useAuth'
 import { useToast } from '../composables/useToast'
+import { usePageTitle } from '../composables/usePageTitle'
 import SortIcon from '../components/SortIcon.vue'
+
+usePageTitle('Users')
 
 const auth = useAuth()
 const toast = useToast()

@@ -6,6 +6,8 @@ A Laravel 13 + Vue.js 3 single-page application (SPA) admin panel that connects 
 
 This admin panel acts as a **backend-for-frontend (BFF)** layer between the Vue.js frontend and the external Product API.
 
+The API source code can be found at https://github.com/kemalyen/product-api
+
 ### Authentication Flow
 
 1. User submits credentials (email/password) to `/api/login`
@@ -45,7 +47,7 @@ This admin panel acts as a **backend-for-frontend (BFF)** layer between the Vue.
 
 1. **Clone the repository**
    ```bash
-   git clone <repository-url> product-admin
+   git clone [https://github.com/kemalyen/product-management.git](https://github.com/kemalyen/product-management.git) product-admin
    cd product-admin
    ```
 

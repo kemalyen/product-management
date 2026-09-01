@@ -22,8 +22,13 @@ export function useProducts() {
         price_value: '',
     })
 
-    const buildQuery = () => {
-        const params = new URLSearchParams()
+    const buildQuery = (page = 1, sortBy = null, sortDirection = 'asc') => {
+        const params = new URLSearchParams({ page: String(page) })
+
+        if (sortBy) {
+            const sortParam = sortDirection === 'desc' ? `-${sortBy}` : sortBy
+            params.append('sort', sortParam)
+        }
 
         if (filters.name) {
             params.append('filter[name]', `*${filters.name}*`)
@@ -49,13 +54,13 @@ export function useProducts() {
         return params.toString()
     }
 
-    const fetchProducts = async (page = 1) => {
+    const fetchProducts = async (page = 1, sortBy = null, sortDirection = 'asc') => {
         loading.value = true
         error.value = ''
 
         try {
-            const query = buildQuery()
-            const url = `/api/products?page=${page}${query ? '&' + query : ''}`
+            const query = buildQuery(page, sortBy, sortDirection)
+            const url = `/api/products?${query}`
 
             const response = await fetch(url, {
                 headers: {

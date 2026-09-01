@@ -75,6 +75,31 @@ export function useAuth() {
         return null
     }
 
+    const updateProfile = async (payload) => {
+        const id = user.value?.data?.id
+        if (!id) {
+            throw new Error('User not loaded')
+        }
+
+        const response = await fetch(`/api/users/${id}`, {
+            method: 'PUT',
+            headers: {
+                'Content-Type': 'application/json',
+                'Accept': 'application/json',
+            },
+            body: JSON.stringify(payload),
+        })
+
+        if (!response.ok) {
+            const error = await response.json()
+            throw new Error(error.message || 'Failed to update profile')
+        }
+
+        const data = await response.json()
+        user.value = data
+        return data
+    }
+
     return {
         user,
         isAuthenticated,
@@ -84,5 +109,6 @@ export function useAuth() {
         login,
         logout,
         fetchUser,
+        updateProfile,
     }
 }

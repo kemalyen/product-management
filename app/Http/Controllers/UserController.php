@@ -45,14 +45,24 @@ class UserController extends Controller
             'email' => ['required', 'email', 'max:255'],
             'password' => ['required', 'string', 'min:8'],
             'role' => ['required', 'string'],
+            'account_id' => ['nullable', 'integer'],
         ]);
 
         $user = $request->session()->get('user');
-        $payload['account_id'] = $user['data']['includes']['id'];
+
+        if (empty($payload['account_id']) || ! $this->isAdmin($user)) {
+            $payload['account_id'] = $user['data']['includes']['id'];
+        }
 
         $data = $this->api->post(config('services.api.version') . '/' . 'users', $payload, $token);
 
         return response()->json($data, 201);
+    }
+
+    private function isAdmin(array $user): bool
+    {
+        return isset($user['data']['relationships']['roles']['data']['name'])
+            && $user['data']['relationships']['roles']['data']['name'] === 'Admin';
     }
 
     public function update(Request $request, string $id): JsonResponse

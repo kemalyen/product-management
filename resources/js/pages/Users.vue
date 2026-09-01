@@ -31,14 +31,14 @@
                             <th scope="col" class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
                                 ID
                             </th>
-                            <th scope="col" class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
-                                Name
+                            <th scope="col" @click="sort('name')" class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider cursor-pointer select-none">
+                                <span class="inline-flex items-center">Name <SortIcon :active="sortBy === 'name'" :direction="sortDirection" /></span>
                             </th>
-                            <th scope="col" class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
-                                Email
+                            <th scope="col" @click="sort('email')" class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider cursor-pointer select-none">
+                                <span class="inline-flex items-center">Email <SortIcon :active="sortBy === 'email'" :direction="sortDirection" /></span>
                             </th>
-                            <th scope="col" class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
-                                Role
+                            <th scope="col"  class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider cursor-pointer select-none">
+                                <span class="inline-flex items-center">Role </span>
                             </th>
                             <th v-if="auth.hasRole('Admin')" scope="col" class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
                                 Actions
@@ -107,34 +107,34 @@
                         {{ isEditing ? 'Edit User' : 'Create User' }}
                     </h3>
                     <form @submit.prevent="handleSubmit">
-                        <div class="space-y-4">
+                        <div class="space-y-5">
                             <div>
-                                <label for="name" class="block text-sm font-medium text-gray-700">Name</label>
+                                <label for="name" class="block text-base font-medium text-gray-700">Name</label>
                                 <input
                                     id="name"
                                     v-model="form.name"
                                     type="text"
                                     required
-                                    class="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-indigo-500 focus:ring-indigo-500 sm:text-sm"
+                                    class="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-indigo-500 focus:ring-indigo-500 text-base border-2 px-4 py-2"
                                 />
                             </div>
                             <div>
-                                <label for="email" class="block text-sm font-medium text-gray-700">Email</label>
+                                <label for="email" class="block text-base font-medium text-gray-700">Email</label>
                                 <input
                                     id="email"
                                     v-model="form.email"
                                     type="email"
                                     required
-                                    class="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-indigo-500 focus:ring-indigo-500 sm:text-sm"
+                                    class="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-indigo-500 focus:ring-indigo-500 text-base px-4 py-2"
                                 />
                             </div>
                             <div>
-                                <label for="role" class="block text-sm font-medium text-gray-700">Role</label>
+                                <label for="role" class="block text-base font-medium text-gray-700">Role</label>
                                 <select
                                     id="role"
                                     v-model="form.role"
                                     required
-                                    class="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-indigo-500 focus:ring-indigo-500 sm:text-sm"
+                                    class="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-indigo-500 focus:ring-indigo-500 text-base px-4 py-2"
                                 >
                                     <option value="">Select a role</option>
                                     <option value="Admin">Admin</option>
@@ -143,28 +143,41 @@
                                 </select>
                             </div>
                             <div v-if="!isEditing">
-                                <label for="password" class="block text-sm font-medium text-gray-700">Password</label>
+                                <label for="password" class="block text-base font-medium text-gray-700">Password</label>
                                 <input
                                     id="password"
                                     v-model="form.password"
                                     type="password"
                                     required
-                                    class="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-indigo-500 focus:ring-indigo-500 sm:text-sm"
+                                    class="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-indigo-500 focus:ring-indigo-500 text-base px-4 py-2"
                                 />
                             </div>
+                            <div v-if="!isEditing && auth.hasRole('Admin')">
+                                <label for="account_id" class="block text-base font-medium text-gray-700">Account</label>
+                                <select
+                                    id="account_id"
+                                    v-model="form.account_id"
+                                    class="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-indigo-500 focus:ring-indigo-500 text-base px-4 py-2"
+                                >
+                                    <option value="">Select an account</option>
+                                    <option v-for="account in accounts" :key="account.id" :value="account.id">
+                                        {{ account.attributes?.name || 'Account ' + account.id }}
+                                    </option>
+                                </select>
+                            </div>
                         </div>
-                        <div class="mt-5 sm:mt-6 sm:grid sm:grid-cols-2 sm:gap-3 sm:grid-flow-row-dense">
+                        <div class="mt-6 grid grid-cols-2 gap-3 sm:grid-flow-row-dense">
                             <button
                                 type="submit"
                                 :disabled="formLoading"
-                                class="w-full inline-flex justify-center rounded-md border border-transparent shadow-sm px-4 py-2 bg-indigo-600 text-base font-medium text-white hover:bg-indigo-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500 sm:col-start-2 sm:text-sm disabled:opacity-50 disabled:cursor-not-allowed"
+                                class="w-full inline-flex justify-center rounded-md border border-transparent shadow-sm px-6 py-3 bg-indigo-600 text-lg font-medium text-white hover:bg-indigo-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500 col-start-2 disabled:opacity-50 disabled:cursor-not-allowed"
                             >
                                 {{ formLoading ? 'Saving...' : (isEditing ? 'Update' : 'Create') }}
                             </button>
                             <button
                                 type="button"
                                 @click="closeModal"
-                                class="mt-3 w-full inline-flex justify-center rounded-md border border-gray-300 shadow-sm px-4 py-2 bg-white text-base font-medium text-gray-700 hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500 sm:mt-0 sm:col-start-1 sm:text-sm"
+                                class="mt-3 w-full inline-flex justify-center rounded-md border border-gray-300 shadow-sm px-6 py-3 bg-white text-lg font-medium text-gray-700 hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500 col-start-1 sm:mt-0"
                             >
                                 Cancel
                             </button>
@@ -208,9 +221,13 @@
 <script setup>
 import { ref, reactive, onMounted, computed } from 'vue'
 import { useUsers } from '../composables/useUsers'
+import { useAccounts } from '../composables/useAccounts'
 import { useAuth } from '../composables/useAuth'
+import { useToast } from '../composables/useToast'
+import SortIcon from '../components/SortIcon.vue'
 
 const auth = useAuth()
+const toast = useToast()
 const {
     users,
     pagination,
@@ -223,23 +240,41 @@ const {
     deleteUser,
 } = useUsers()
 
+const {
+    accounts,
+    fetchAccounts,
+} = useAccounts()
+
 const showModal = ref(false)
 const showDeleteModal = ref(false)
 const isEditing = ref(false)
 const formLoading = ref(false)
 const deleteLoading = ref(false)
 const selectedUser = ref(null)
+const sortBy = ref('')
+const sortDirection = ref('asc')
 
 const form = reactive({
     name: '',
     email: '',
     password: '',
     role: '',
+    account_id: '',
 })
 
 onMounted(() => {
     fetchUsers(1)
 })
+
+const sort = (column) => {
+    if (sortBy.value === column) {
+        sortDirection.value = sortDirection.value === 'asc' ? 'desc' : 'asc'
+    } else {
+        sortBy.value = column
+        sortDirection.value = 'desc'
+    }
+    fetchUsers(1, sortBy.value, sortDirection.value)
+}
 
 const pageLinks = computed(() => {
     if (!pagination.links || pagination.links.length === 0) {
@@ -255,13 +290,14 @@ const pageLinks = computed(() => {
         }))
 })
 
-const openModal = (user = null) => {
+const openModal = async (user = null) => {
     if (user) {
         isEditing.value = true
         form.name = user.attributes?.name || user.name || ''
         form.email = user.attributes?.email || user.email || ''
         form.password = ''
         form.role = user?.relationships?.roles?.data?.name || ''
+        form.account_id = ''
         selectedUser.value = user
     } else {
         isEditing.value = false
@@ -269,7 +305,12 @@ const openModal = (user = null) => {
         form.email = ''
         form.password = ''
         form.role = ''
+        form.account_id = ''
         selectedUser.value = null
+
+        if (auth.hasRole('Admin')) {
+            await fetchAccounts(1)
+        }
     }
     showModal.value = true
 }
@@ -282,6 +323,7 @@ const closeModal = () => {
     form.email = ''
     form.password = ''
     form.role = ''
+    form.account_id = ''
 }
 
 const handleSubmit = async () => {
@@ -302,14 +344,21 @@ const handleSubmit = async () => {
             payload.password = form.password
         }
 
+        if (!isEditing.value && auth.hasRole('Admin') && form.account_id) {
+            payload.account_id = form.account_id
+        }
+
+        let result
         if (isEditing.value && selectedUser.value) {
-            await updateUser(selectedUser.value.id, payload)
+            result = await updateUser(selectedUser.value.id, payload)
+            toast.success('User updated successfully.')
         } else {
-            await createUser(payload)
+            result = await createUser(payload)
+            toast.success('User created successfully.')
         }
 
         closeModal()
-        fetchUsers(pagination.current_page)
+        fetchUsers(1, sortBy.value, sortDirection.value)
     } catch (e) {
         error.value = e.message || 'Failed to save user'
     } finally {
@@ -329,9 +378,10 @@ const handleDelete = async () => {
 
     try {
         await deleteUser(selectedUser.value.id)
+        toast.success('User deleted successfully.')
         showDeleteModal.value = false
         selectedUser.value = null
-        fetchUsers(pagination.current_page)
+        fetchUsers(1, sortBy.value, sortDirection.value)
     } catch (e) {
         error.value = e.message || 'Failed to delete user'
     } finally {

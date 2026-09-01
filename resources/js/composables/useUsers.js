@@ -11,12 +11,18 @@ export function useUsers() {
     const loading = ref(false)
     const error = ref('')
 
-    const fetchUsers = async (page = 1) => {
+    const fetchUsers = async (page = 1, sortBy = null, sortDirection = 'asc') => {
         loading.value = true
         error.value = ''
 
         try {
-            const response = await fetch(`/api/users?page=${page}`, {
+            const params = new URLSearchParams({ page })
+            if (sortBy) {
+                const sortParam = sortDirection === 'desc' ? `-${sortBy}` : sortBy
+                params.append('sort', sortParam)
+            }
+
+            const response = await fetch(`/api/users?${params.toString()}`, {
                 headers: {
                     'Accept': 'application/json',
                 },

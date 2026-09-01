@@ -3,12 +3,14 @@
 use App\Http\Controllers\AccountController;
 use App\Http\Controllers\AuthController;
 use App\Http\Controllers\ProductController;
+use App\Http\Controllers\ProfileController;
 use App\Http\Controllers\UserController;
 use Illuminate\Support\Facades\Route;
 
 Route::post('/api/login', [AuthController::class, 'login']);
 Route::post('/api/logout', [AuthController::class, 'logout']);
 Route::get('/api/me', [AuthController::class, 'me'])->middleware('auth.spa');
+Route::put('/api/profile', [ProfileController::class, 'update'])->middleware('auth.spa');
 Route::get('/api/products', [ProductController::class, 'index'])->middleware('auth.spa');
 Route::get('/api/products/{id}', [ProductController::class, 'show'])->middleware('auth.spa');
 Route::post('/api/products', [ProductController::class, 'store'])->middleware('auth.spa');

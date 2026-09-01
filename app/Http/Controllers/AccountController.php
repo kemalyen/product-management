@@ -20,7 +20,7 @@ class AccountController extends Controller
             $params['page'] = (int) $params['page'];
         }
 
-        $data = $this->api->get(config('services.api.version') . '/' . 'accounts', $params, $token);
+        $data = $this->api->get(config('services.api.version').'/'.'accounts', $params, $token);
 
         return response()->json($data);
     }
@@ -29,7 +29,7 @@ class AccountController extends Controller
     {
         $token = $request->session()->get('api_token');
 
-        $data = $this->api->get(config('services.api.version') . '/' . 'accounts/' . $id, [], $token);
+        $data = $this->api->get(config('services.api.version').'/'.'accounts/'.$id, [], $token);
 
         return response()->json($data);
     }
@@ -40,11 +40,11 @@ class AccountController extends Controller
 
         $payload = $request->validate([
             'name' => ['required', 'string', 'max:255'],
-            'account_number' => ['required', 'digits_between:2,10', 'unique:accounts'],
+            'account_number' => ['required', 'digits_between:2,10'],
             'status' => ['required', 'string'],
         ]);
 
-        $data = $this->api->post(config('services.api.version') . '/' . 'accounts', $payload, $token);
+        $data = $this->api->post(config('services.api.version').'/'.'accounts', $payload, $token);
 
         return response()->json($data, 201);
     }
@@ -59,7 +59,7 @@ class AccountController extends Controller
             'status' => ['sometimes', 'string'],
         ]);
 
-        $data = $this->api->put(config('services.api.version') . '/' . 'accounts/' . $id, $payload, $token);
+        $data = $this->api->put(config('services.api.version').'/'.'accounts/'.$id, $payload, $token);
 
         return response()->json($data);
     }
@@ -68,7 +68,7 @@ class AccountController extends Controller
     {
         $token = $request->session()->get('api_token');
 
-        $this->api->delete(config('services.api.version') . '/' . 'accounts/' . $id, $token);
+        $this->api->delete(config('services.api.version').'/'.'accounts/'.$id, $token);
 
         return response()->json(null, 204);
     }

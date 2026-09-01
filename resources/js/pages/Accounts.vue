@@ -31,14 +31,14 @@
                             <th scope="col" class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
                                 ID
                             </th>
-                            <th scope="col" class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
-                                Name
+                            <th scope="col" @click="sort('name')" class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider cursor-pointer select-none">
+                                <span class="inline-flex items-center">Name <SortIcon :active="sortBy === 'name'" :direction="sortDirection" /></span>
                             </th>
-                            <th scope="col" class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
-                                Account Number
+                            <th scope="col" @click="sort('account_number')" class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider cursor-pointer select-none">
+                                <span class="inline-flex items-center">Account Number <SortIcon :active="sortBy === 'account_number'" :direction="sortDirection" /></span>
                             </th>
-                            <th scope="col" class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
-                                Status
+                            <th scope="col" @click="sort('status')" class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider cursor-pointer select-none">
+                                <span class="inline-flex items-center">Status <SortIcon :active="sortBy === 'status'" :direction="sortDirection" /></span>
                             </th>
                             <th v-if="auth.hasRole('Admin')" scope="col" class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
                                 Actions
@@ -110,34 +110,34 @@
                         {{ isEditing ? 'Edit Account' : 'Create Account' }}
                     </h3>
                     <form @submit.prevent="handleSubmit">
-                        <div class="space-y-4">
+                        <div class="space-y-5">
                             <div>
-                                <label for="name" class="block text-sm font-medium text-gray-700">Name</label>
+                                <label for="name" class="block text-base font-medium text-gray-700">Name</label>
                                 <input
                                     id="name"
                                     v-model="form.name"
                                     type="text"
                                     required
-                                    class="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-indigo-500 focus:ring-indigo-500 sm:text-sm"
+                                    class="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-indigo-500 focus:ring-indigo-500 text-base px-4 py-2"
                                 />
                             </div>
                             <div>
-                                <label for="account_number" class="block text-sm font-medium text-gray-700">Account Number</label>
+                                <label for="account_number" class="block text-base font-medium text-gray-700">Account Number</label>
                                 <input
                                     id="account_number"
                                     v-model="form.account_number"
                                     type="text"
                                     required
-                                    class="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-indigo-500 focus:ring-indigo-500 sm:text-sm"
+                                    class="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-indigo-500 focus:ring-indigo-500 text-base px-4 py-2"
                                 />
                             </div>
                             <div>
-                                <label for="status" class="block text-sm font-medium text-gray-700">Status</label>
+                                <label for="status" class="block text-base font-medium text-gray-700">Status</label>
                                 <select
                                     id="status"
                                     v-model="form.status"
                                     required
-                                    class="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-indigo-500 focus:ring-indigo-500 sm:text-sm"
+                                    class="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-indigo-500 focus:ring-indigo-500 text-base px-4 py-2"
                                 >
                                     <option value="">Select</option>
                                     <option value="active">Active</option>
@@ -146,18 +146,18 @@
                                 </select>
                             </div>
                         </div>
-                        <div class="mt-5 sm:mt-6 sm:grid sm:grid-cols-2 sm:gap-3 sm:grid-flow-row-dense">
+                        <div class="mt-6 grid grid-cols-2 gap-3 sm:grid-flow-row-dense">
                             <button
                                 type="submit"
                                 :disabled="formLoading"
-                                class="w-full inline-flex justify-center rounded-md border border-transparent shadow-sm px-4 py-2 bg-indigo-600 text-base font-medium text-white hover:bg-indigo-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500 sm:col-start-2 sm:text-sm disabled:opacity-50 disabled:cursor-not-allowed"
+                                class="w-full inline-flex justify-center rounded-md border border-transparent shadow-sm px-6 py-3 bg-indigo-600 text-lg font-medium text-white hover:bg-indigo-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500 col-start-2 disabled:opacity-50 disabled:cursor-not-allowed"
                             >
                                 {{ formLoading ? 'Saving...' : (isEditing ? 'Update' : 'Create') }}
                             </button>
                             <button
                                 type="button"
                                 @click="closeModal"
-                                class="mt-3 w-full inline-flex justify-center rounded-md border border-gray-300 shadow-sm px-4 py-2 bg-white text-base font-medium text-gray-700 hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500 sm:mt-0 sm:col-start-1 sm:text-sm"
+                                class="mt-3 w-full inline-flex justify-center rounded-md border border-gray-300 shadow-sm px-6 py-3 bg-white text-lg font-medium text-gray-700 hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500 col-start-1 sm:mt-0"
                             >
                                 Cancel
                             </button>
@@ -202,8 +202,14 @@
 import { ref, reactive, onMounted, computed } from 'vue'
 import { useAccounts } from '../composables/useAccounts'
 import { useAuth } from '../composables/useAuth'
+import { useToast } from '../composables/useToast'
+import { usePageTitle } from '../composables/usePageTitle'
+import SortIcon from '../components/SortIcon.vue'
+
+usePageTitle('Accounts')
 
 const auth = useAuth()
+const toast = useToast()
 const {
     accounts,
     pagination,
@@ -222,6 +228,8 @@ const isEditing = ref(false)
 const formLoading = ref(false)
 const deleteLoading = ref(false)
 const selectedAccount = ref(null)
+const sortBy = ref('')
+const sortDirection = ref('asc')
 
 const form = reactive({
     name: '',
@@ -232,6 +240,16 @@ const form = reactive({
 onMounted(() => {
     fetchAccounts(1)
 })
+
+const sort = (column) => {
+    if (sortBy.value === column) {
+        sortDirection.value = sortDirection.value === 'asc' ? 'desc' : 'asc'
+    } else {
+        sortBy.value = column
+        sortDirection.value = 'desc'
+    }
+    fetchAccounts(1, sortBy.value, sortDirection.value)
+}
 
 const pageLinks = computed(() => {
     if (!pagination.links || pagination.links.length === 0) {
@@ -285,12 +303,14 @@ const handleSubmit = async () => {
 
         if (isEditing.value && selectedAccount.value) {
             await updateAccount(selectedAccount.value.id, payload)
+            toast.success('Account updated successfully.')
         } else {
             await createAccount(payload)
+            toast.success('Account created successfully.')
         }
 
         closeModal()
-        fetchAccounts(pagination.current_page)
+        fetchAccounts(1, sortBy.value, sortDirection.value)
     } catch (e) {
         error.value = e.message || 'Failed to save account'
     } finally {
@@ -310,9 +330,10 @@ const handleDelete = async () => {
 
     try {
         await deleteAccount(selectedAccount.value.id)
+        toast.success('Account deleted successfully.')
         showDeleteModal.value = false
         selectedAccount.value = null
-        fetchAccounts(pagination.current_page)
+        fetchAccounts(1, sortBy.value, sortDirection.value)
     } catch (e) {
         error.value = e.message || 'Failed to delete account'
     } finally {

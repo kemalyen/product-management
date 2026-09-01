@@ -11,12 +11,18 @@ export function useAccounts() {
     const loading = ref(false)
     const error = ref('')
 
-    const fetchAccounts = async (page = 1) => {
+    const fetchAccounts = async (page = 1, sortBy = null, sortDirection = 'asc') => {
         loading.value = true
         error.value = ''
 
         try {
-            const response = await fetch(`/api/accounts?page=${page}`, {
+            const params = new URLSearchParams({ page })
+            if (sortBy) {
+                const sortParam = sortDirection === 'desc' ? `-${sortBy}` : sortBy
+                params.append('sort', sortParam)
+            }
+
+            const response = await fetch(`/api/accounts?${params.toString()}`, {
                 headers: {
                     'Accept': 'application/json',
                 },
